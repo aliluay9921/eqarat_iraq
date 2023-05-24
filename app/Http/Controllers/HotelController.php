@@ -41,6 +41,12 @@ class HotelController extends Controller
         $validator = Validator($request->all(), [
             "desc" => "required|string",
             'room_type' => 'required',
+            'images' => "requires",
+        ], [
+            'desc.required' => "يجب أدخال الوصف",
+            'room_type.required' => "يجب أدخال نوع الغرفة",
+            "images.required" => "يجب اضافة صورة واحدة على الاقل"
+
         ]);
         if ($validator->fails()) {
             return $this->send_response(422, 'خطأ في البيانات', $validator->errors(), null, null, 0);

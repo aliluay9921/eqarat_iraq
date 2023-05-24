@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->uuid("id")->primary();
             $table->uuid("user_id");
-            $table->string("phone_number");
-            $table->string("address");
+            $table->string("phone_number")->nullable();
+            $table->string("address")->nullable();
             $table->string("longetude");
             $table->string("latetude");
             $table->integer("item_type"); // house , shop ,school 

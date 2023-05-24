@@ -26,7 +26,6 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::middleware(['admin'])->group(function () {
         Route::get("get_all_users", [AuthController::class, 'getAllUsers']);
         Route::put("change_active_user", [AuthController::class, 'changeActiveUser']);
-        Route::put("edit_service", [ServicesController::class, 'editService']);
     });
 
     Route::get("get_services", [ServicesController::class, "getServices"]);
@@ -37,8 +36,10 @@ Route::middleware(['auth:api', 'active'])->group(function () {
     Route::post("add_post", [PostController::class, 'addPost']);
     Route::post("add_hotel", [HotelController::class, 'addHotel']);
 
+    Route::put("edit_service", [ServicesController::class, 'editService']);
     Route::put("update_post", [PostController::class, 'updatePost']);
     Route::put("update_hotel", [HotelController::class, 'updateHotel']);
+    
     Route::delete("delete_post", [PostController::class, 'deletePost']);
     Route::delete("delete_service", [ServicesController::class, 'deleteService']);
     Route::delete("delete_hotel", [HotelController::class, 'deleteHotel']);

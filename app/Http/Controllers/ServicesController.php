@@ -68,10 +68,14 @@ class ServicesController extends Controller
         $request = $request->json()->all();
         $validator = Validator::make($request, [
             "desc" => 'required',
-            "images" => "required"
+            "images" => "required",
+            "time_to_finish" => 'required',
+            "address_project" => "required"
         ], [
             "desc.required" => " يجب أدخال الوصف ",
             "images.required" => " يجب أدخال الصور ",
+            "time_to_finish.required" => " يجب أدخال مدة التنفيذ ",
+            "address_project.required" => " يجب أدخال عنوان المشروع "
         ]);
         if ($validator->fails()) {
             return $this->send_response(400, "حصل خطأ في المدخلات", $validator->errors(), []);
