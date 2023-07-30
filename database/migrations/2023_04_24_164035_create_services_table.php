@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string("offer")->nullable();
             $table->date("expaired_offer")->nullable();
             $table->string("desc")->nullable();
-            $table->date("time_to_finish")->nullable();
+            $table->string("time_to_finish")->nullable();
             $table->string("address_project")->nullable();
             $table->string("notes")->nullable();
             $table->timestamps();

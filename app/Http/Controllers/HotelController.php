@@ -10,6 +10,7 @@ use App\Traits\OrderBy;
 use App\Traits\Pagination;
 use App\Traits\SendResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class HotelController extends Controller
 {
@@ -20,7 +21,16 @@ class HotelController extends Controller
         $hotels = Hotel::select("*");
 
         if (isset($_GET["query"])) {
-            $hotels = $this->search($hotels, 'hotels');
+            $hotels->where(function ($q) {
+                $q->whereHas("user", function ($query) {
+                    $query->where("user_name", 'LIKE', '%' . $_GET['query'] . '%');
+                });
+                $columns = Schema::getColumnListing('hotels');
+                foreach ($columns as $column) {
+                    $q->orWhere($column, 'LIKE', '%' . $_GET['query'] . '%');
+                }
+            });
+            // $hotels = $this->search($hotels, 'hotels');
         }
         if (isset($_GET['filter'])) {
             $this->filter($hotels, $_GET["filter"]);

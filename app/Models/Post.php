@@ -11,6 +11,7 @@ class Post extends Model
     use HasFactory, Uuids;
 
     protected $guarded = [];
+    protected $with = ["user"];
 
     public function user()
     {

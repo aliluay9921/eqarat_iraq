@@ -36,6 +36,26 @@ class AuthController extends Controller
         return $this->send_response(200, 'تم جلب المستخدمين بنجاح', [], $res["model"], null, $res["count"]);
     }
 
+    public function getUser()
+    {
+        $users = User::select("*");
+        if (isset($_GET["query"])) {
+            $this->search($users, 'users');
+        }
+        if (isset($_GET['filter'])) {
+            $this->filter($users, $_GET["filter"]);
+        }
+        if (isset($_GET)) {
+            $this->order_by($users, $_GET);
+        }
+        if (!isset($_GET['skip']))
+            $_GET['skip'] = 0;
+        if (!isset($_GET['limit']))
+            $_GET['limit'] = 10;
+        $res = $this->paging($users->orderBy("created_at", "DESC"),  $_GET['skip'],  $_GET['limit']);
+        return $this->send_response(200, 'تم جلب المستخدمين بنجاح', [], $res["model"], null, $res["count"]);
+    }
+
 
 
     public function login(Request $request)
@@ -89,7 +109,7 @@ class AuthController extends Controller
             'phone_number' => $request['phone_number'],
             'password' => bcrypt($request['password']),
             'user_type' => $request["user_type"],
-            'adderss' => $request["adderss"] ?? null,
+            'address' => $request["address"] ?? null,
             'longetude' => $request["longetude"] ?? null,
             'latetude' => $request["latetude"] ?? null,
 

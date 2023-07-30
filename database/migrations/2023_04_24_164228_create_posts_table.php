@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string("address")->nullable();
             $table->string("longetude");
             $table->string("latetude");
-            $table->integer("item_type"); // house , shop ,school 
+            $table->integer("item_type"); // house , shop  
             $table->integer("item_status"); // 0 for rent 1 for sale
             $table->integer("price");
             $table->string("desc")->nullable();

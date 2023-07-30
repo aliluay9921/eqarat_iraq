@@ -25,8 +25,19 @@ class PostController extends Controller
         if (isset($_GET["query"])) {
             $posts = $this->search($posts, 'posts');
         }
+        // [{"name":"address","value":"baghdad"},
+        // {"name":"item_type","value":"1"},
+        // {"name":"price","value":[500000,900000]}]
         if (isset($_GET['filter'])) {
-            $this->filter($posts, $_GET["filter"]);
+            $filter = json_decode($_GET['filter']);
+            // return $filter;
+            foreach ($filter as $_filter) {
+                if ($_filter->name === 'price') {
+                    $posts->whereBetween('price', [$_filter->value[0], $_filter->value[1]]);
+                } else {
+                    $posts->Where($_filter->name, $_filter->value);
+                }
+            }
         }
         if (isset($_GET)) {
             $this->order_by($posts, $_GET);

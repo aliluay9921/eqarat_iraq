@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Image;
-use App\Models\Service;
 use App\Traits\Filter;
 use App\Traits\Search;
+use App\Models\Service;
 use App\Traits\OrderBy;
 use App\Traits\Pagination;
 use App\Traits\UploadImage;
 use App\Traits\SendResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class ServicesController extends Controller
@@ -26,7 +27,18 @@ class ServicesController extends Controller
         $services = Service::with("images");
 
         if (isset($_GET["query"])) {
-            $services = $this->search($services, 'services');
+            if (isset($_GET["query"])) {
+                $services->where(function ($q) {
+                    $q->whereHas("user", function ($query) {
+                        $query->where("user_name", 'LIKE', '%' . $_GET['query'] . '%');
+                    });
+                    $columns = Schema::getColumnListing('services');
+                    foreach ($columns as $column) {
+                        $q->orWhere($column, 'LIKE', '%' . $_GET['query'] . '%');
+                    }
+                });
+                // $hotels = $this->search($hotels, 'hotels');
+            }
         }
         if (isset($_GET['filter'])) {
             $this->filter($services, $_GET["filter"]);
@@ -70,12 +82,12 @@ class ServicesController extends Controller
             "desc" => 'required',
             "images" => "required",
             "time_to_finish" => 'required',
-            "address_project" => "required"
+            "address_project" => "required",
         ], [
             "desc.required" => " يجب أدخال الوصف ",
             "images.required" => " يجب أدخال الصور ",
             "time_to_finish.required" => " يجب أدخال مدة التنفيذ ",
-            "address_project.required" => " يجب أدخال عنوان المشروع "
+            "address_project.required" => " يجب أدخال عنوان المشروع ",
         ]);
         if ($validator->fails()) {
             return $this->send_response(400, "حصل خطأ في المدخلات", $validator->errors(), []);
@@ -86,6 +98,7 @@ class ServicesController extends Controller
         $data["expaired_offer"] = $request["expaired_offer"] ?? null;
         $data["time_to_finish"] = $request["time_to_finish"] ?? null;
         $data["address_project"] = $request["address_project"] ?? null;
+        $data["type"] = auth()->user()->user_type == 3 ? 1 : 2;
 
 
         $data["user_id"] = auth()->user()->id;
@@ -158,5 +171,22 @@ class ServicesController extends Controller
         } else {
             return $this->send_response(400, 'لا يمكنك حذف هذه الخدمة', [], []);
         }
+    }
+
+    public function deleteImage(Request $request)
+    {
+        $request = $request->json()->all();
+        $validator = Validator::make($request, [
+            "id" => "required|exists:images,id",
+        ], [
+            "id.required" => "يجب إدخال رقم الصورة",
+            "id.exists" => "الصورة غير موجودة",
+        ]);
+        if ($validator->fails()) {
+            return $this->send_response(400, "حصل خطأ في المدخلات", $validator->errors(), []);
+        }
+        $image = Image::find($request['id']);
+        $image->delete();
+        return $this->send_response(200, 'تم حذف الصورة بنجاح', [], []);
     }
 }
